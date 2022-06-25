@@ -1,17 +1,39 @@
 const mongoose = require('mongoose')
 
-const GoalSchema = mongoose.Schema( {
-    id: {
-        type: Number,
-        required: false
-    },
-    title: {
+
+const taskSchema = mongoose.Schema({
+    description: {
         type: String,
         required: true
     },
-    tasks: {
-        type: [String],
+    completed: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
+})
+
+const GoalSchema = mongoose.Schema( {
+    id: {
+        type: Number,
         required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    startDate: {
+        type: Date,
+        required: false
+    },
+    hours: {
+        type: mongoose.Types.Decimal128,
+        required: true
+    },
+    tasks: {
+        type: [taskSchema],
+        required: true,
+        default: []
     }
 })
 

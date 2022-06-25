@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
+require('dotenv').config()
 const Goal = require('./models/Goal')
 const express = require('express')
 const cors = require('cors')
 require('body-parser')
-require('dotenv').config()
 
 //initiate server
 const app = express()
@@ -13,8 +13,11 @@ const port = 5100
 app.use(cors())
 app.use(express.json())
 
+const URL = process.env.DB_CONNECTION
+console.log(URL)
+
 // //connect to database
-mongoose.connect('mongodb+srv://IsAli:Nacho!25@cluster0.7mqyc.mongodb.net/thoughtMetadata', {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true})
+mongoose.connect(URL, {useNewUrlParser: true, useUnifiedTopology: true})
 const connection = mongoose.connection
 connection.once('open', () => {console.log('successfully connected to MongoDB database')})
 
