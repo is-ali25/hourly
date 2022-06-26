@@ -1,7 +1,8 @@
-const Test = () => {
+const Test = ({items, set}) => {
     return(
         <div>
-            <h1>TESTING</h1>
+            <h1>{items}</h1>
+            <h2>{typeof set}</h2>
         </div>
     )
 }

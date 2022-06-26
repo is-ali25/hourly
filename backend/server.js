@@ -32,10 +32,9 @@ app.get('/', async (req, res) => {
 })
 
 app.post('/add', async (req, res) => {
-    console.log("request has been received")
-    const newThought = new Goal(req.body)
+    const newGoal = new Goal(req.body)
     try {
-        await newThought.save()
+        await newGoal.save()
         console.log('successful post request')
         res.status(201).json(newThought)
     } catch (error) {

@@ -16,14 +16,18 @@ function App() {
     async function start() {
       await axios.get('http://localhost:5100/')
       .then(res => {
-        console.log(res.data)
-        setGoals(res.data)
+        // console.log(res.data)
+        const cleaned = res.data.map(item => Utils.convertToGoal(item))
+        console.log(cleaned)
+        setGoals(cleaned)
       })
       .catch(err => console.error(err))
     }
 
     start()
   }, [])
+
+  console.log(goals)
 
    const updateForm = (name, value) => {
     setFormData(prevData => {return {...prevData, [name]: value }})
@@ -32,15 +36,16 @@ function App() {
   // for toggling tasks
   // you gotta edit the database no?
 
-
   const formHandler = async (e) => {
     e.preventDefault()
-    await axios.post('http://localhost:5100/add', formData)
-        .then(res => {
-          setGoals(prevData => {
-            return [...prevData, Utils.formToGoal(res.data)]
-          })
-    }).catch(err => console.error(err))
+    const formatted = Utils.format(formData, goals.length)
+    await axios.post('http://localhost:5100/add', formatted)
+    //     .then(res => {
+    //       setGoals(prevData => {
+    //         return [...prevData, res.data]
+    //       })
+    // })
+    .catch(err => console.error(err))
     setAddNew(false)
     setFormData(Utils.blankForm())
   }
@@ -48,16 +53,14 @@ function App() {
   return (
     <div className="App">
       {goals.map(goal => (
-        <Goal 
+        <Goal key={goal.id}
           id={goal.id} 
-          name={goal.name} 
+          name={goal.name}
           startDate={goal.startDate} 
           hours={goal.hours} 
           subtasks={goal.tasks}/>
       ))}
-      <button className="newItem" onClick={() => setAddNew(!addNew)}>+</button>
-
-      <Test/>
+      <button className="newItem" value={addNew ? "-" : "+"} onClick={() => setAddNew(!addNew)}>Add Goal</button>
 
       {addNew ? <New 
         name={formData.name}
@@ -66,7 +69,7 @@ function App() {
         update={updateForm}
         cancel={() => setAddNew(false)}
         onSubmit={formHandler}
-      /> : <></>}
+      /> : null}
     </div>
   );
 }

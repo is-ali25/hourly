@@ -27,7 +27,7 @@ const GoalSchema = mongoose.Schema( {
         required: false
     },
     hours: {
-        type: mongoose.Types.Decimal128,
+        type: Number,
         required: true
     },
     tasks: {
