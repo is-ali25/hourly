@@ -12,7 +12,7 @@ export function convertToGoal(submission) {
         name: submission.name,
         startDate:submission.startDate,
         hours:submission.hours.$numberDecimal,
-        tasks: []
+        tasks: submission.tasks
     }
 
     return goal

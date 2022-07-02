@@ -1,18 +1,20 @@
-const Goal = ({id, name, startDate, hours, subtasks, taskComplete, newTask}) => {
+const Goal = ({id, name, startDate, hours, subtasks, taskComplete, update, newTask, startEdit}) => {
     return(
         <div className="goal">
             <h1>{name}</h1>
             <h4>{startDate}</h4>
             <h2>{hours}</h2>
-            <div>
-                {subtasks.map(task => (
-                    <div>
-                        <input type="checkbox" id={id} onChange={taskComplete}/>
-                        <label for={id}>{task.description}</label><br/>
-                    </div>
-                ))}
-                <button onClick={newTask}>Add Task</button>
-            </div>
+            {subtasks.map(task => ( 
+                <div key={task.description.length}>
+                    <input type="checkbox" id={task.description.length} onChange={taskComplete}/>
+                    <label>{task.description}</label><br/>
+                </div>
+            ))}
+            <form onSubmit={newTask}>
+                <input type="text" onChange= {(e) => update(e.target.value, id)}/>
+                <input type="submit" value="Add Task"/>
+            </form> 
+            <button onClick={startEdit}>Edit</button>
         </div>
     )
 }

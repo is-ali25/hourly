@@ -24,8 +24,8 @@ connection.once('open', () => {console.log('successfully connected to MongoDB da
 //routes
 app.get('/', async (req, res) => {
     try {
-        const Thoughts = await Goal.find()
-        res.status(200).json(Thoughts)
+        const Goals = await Goal.find()
+        res.status(200).json(Goals)
     } catch (error) {
         res.status(404).json({message: error.message})
     }
@@ -36,11 +36,33 @@ app.post('/add', async (req, res) => {
     try {
         await newGoal.save()
         console.log('successful post request')
-        res.status(201).json(newThought)
+        res.status(201).json(newGoal)
     } catch (error) {
         res.status(400).json({message: error.message})
     }
 })
+
+app.put('/update/:id', async (req, res) => {
+    console.log(`${req.params.id}: ${req.body.description}`)
+    try {
+        await Goal.updateOne({id: req.params.id}, {$push: {"tasks": req.body}})
+        .then(updated => res.json(updated))
+        console.log('successful put request')
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+})
+
+// app.delete('/:id', async (req, res) => {
+//     try {
+//         await Goal.deleteOne({id: req.params})
+//         .then(updated => res.json(updated))
+//     } catch (error) {
+//         res.status(400).json({message: error.message})
+//     }
+// })
+
+
 
 //start server
 app.listen(port, () => console.log(`server is listening on port ${port}`))
