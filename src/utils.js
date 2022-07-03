@@ -1,14 +1,16 @@
 export function blankForm() {
     return {
+        id: null,
         name: '',
         startDate:'',
-        hours:''
+        tasks: []
       }
 }
 
 export function convertToGoal(submission) {
     const goal = {
-        id: submission.id,
+        _id: submission._id,
+        id: submission._id,
         name: submission.name,
         startDate:submission.startDate,
         hours:submission.hours.$numberDecimal,

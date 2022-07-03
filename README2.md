@@ -1,7 +1,5 @@
 TODO:
--Figure out patch requests
--Figure out Mongoose Date type and how to make it correspond with form data
--Editing and Deleting Elements of MongoDB databases
--taskComplete and newTask
+-Check marks and deletions
 -Styling
 -Clock and Timing
+-evaluate and make new list

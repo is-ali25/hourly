@@ -2,10 +2,11 @@ const Goal = ({id, name, startDate, hours, subtasks, taskComplete, update, newTa
     return(
         <div className="goal">
             <h1>{name}</h1>
+            <h3>{id}</h3>
             <h4>{startDate}</h4>
             <h2>{hours}</h2>
             {subtasks.map(task => ( 
-                <div key={task.description.length}>
+                <div key={task._id}>
                     <input type="checkbox" id={task.description.length} onChange={taskComplete}/>
                     <label>{task.description}</label><br/>
                 </div>
@@ -14,7 +15,7 @@ const Goal = ({id, name, startDate, hours, subtasks, taskComplete, update, newTa
                 <input type="text" onChange= {(e) => update(e.target.value, id)}/>
                 <input type="submit" value="Add Task"/>
             </form> 
-            <button onClick={startEdit}>Edit</button>
+            <button onClick={() => startEdit({id})}>Edit</button>
         </div>
     )
 }

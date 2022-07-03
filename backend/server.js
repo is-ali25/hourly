@@ -42,10 +42,21 @@ app.post('/add', async (req, res) => {
     }
 })
 
-app.put('/update/:id', async (req, res) => {
+app.put('/task-update/:id', async (req, res) => {
     console.log(`${req.params.id}: ${req.body.description}`)
     try {
         await Goal.updateOne({id: req.params.id}, {$push: {"tasks": req.body}})
+        .then(updated => res.json(updated))
+        console.log('successful put request')
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+})
+
+app.put('/goal-update/:id', async (req, res) => {
+    console.log(`updating goal ${req.params.id}`)
+    try {
+        await Goal.updateOne({_id: req.params.id}, {$set: {"tasks" : req.body.tasks}})
         .then(updated => res.json(updated))
         console.log('successful put request')
     } catch (error) {

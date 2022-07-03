@@ -2,7 +2,7 @@ import './App.css';
 import Goal from './Components/Goal'
 import GoalEdit from './Components/GoalEdit'
 import New from './Components/New'
-import Test from './Components/Test'
+// import Test from './Components/Test'
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import * as Utils from './utils'
@@ -33,11 +33,19 @@ function App() {
 
   console.log(goals)
 
-   const updateForm = (name, value) => {
-    setFormData(prevData => {return {...prevData, [name]: value }})
+  
+  //for adding goals
+  const formHandler = async (e) => {
+    e.preventDefault()
+    const formatted = Utils.format(formData, goals.length)
+    await axios.post('http://localhost:5100/add', formatted)
+    .catch(err => console.error(err))
+    setAddNew(false)
+    setFormData(Utils.blankForm())
   }
 
-   const updateTaskForm = (value, id) => {
+  //for adding tasks to goals
+  const updateTaskForm = (value, id) => {
     setTaskData({"id": id, "description": value })
   }
 
@@ -48,58 +56,83 @@ function App() {
       description: taskData.description,
       completed: false
     }
-    await axios.put(`http://localhost:5100/update/${taskData.id}`, newTask)
+    await axios.put(`http://localhost:5100/task-update/${taskData.id}`, newTask)
     .then(res => res.data)
     .catch(err => console.error(err))
     //need to make component rerender
     setTaskData(prevData => {return {...prevData, "description": ""}})
   }
+  
+  //for editing tasks
+  const startEdit = (id) => {
+    setFormData(prevData => {
+      let newData = prevData
+      newData.id = id
+      goals.forEach(goal => {
+        if (goal._id === id.id) {
+          newData.tasks = goal.tasks
+        }
+      })
+      return newData
+    })
+    setEditReady(true)
+  }
 
-  const updateTasks = async (e) => {
+  const updateForm = (name, value, id) => {
+    console.log(id)
+    name == "tasks" ?
+      setFormData(prevData => {
+        let newTasks = prevData.tasks
+        newTasks.forEach(task => {
+          if (task._id == id) {
+            task.description = value
+          }
+        })
+        return {...prevData, "tasks": newTasks}
+      })
+    :
+      setFormData(prevData => {return {...prevData, [name]: value }})
+  }
+
+  const updateGoal = async (e) => {
     e.preventDefault()
-    console.log(e.target.value)
-    // console.log("update begun")
-    // await axios.put('http://localhost:5100/0', formatted)
-    // .catch(err => console.error(err))
+    console.log(formData)
+    console.log(formData.id)
+    await axios.put(`http://localhost:5100/goal-update/${formData.id.id}`, formData)
+    .then(res => res.data)
+    .catch(err => console.error(err))
     setEditReady(false)
   }
 
   // for toggling tasks
-  // you gotta edit the database no?
 
-  const formHandler = async (e) => {
-    e.preventDefault()
-    const formatted = Utils.format(formData, goals.length)
-    await axios.post('http://localhost:5100/add', formatted)
-    .catch(err => console.error(err))
-    setAddNew(false)
-    setFormData(Utils.blankForm())
-  }
-
+  //the actual app
   return (
     <div>
       <div className="App">
         {goals.map(goal => (
-          editReady == true ? 
+          editReady ? 
           <GoalEdit 
-            key={goal.id}
+            key={goal._id}
+            id={goal._id} 
             name={goal.name}
-            startDate={goal.startDate} 
+            startDate={goal.startDate.split("T")[0]} 
             hours={goal.hours} 
             subtasks={goal.tasks}
             update={updateForm}
-            editTasks={updateTasks}/>
+            edit={updateGoal}
+            cancel={() => setEditReady(false)}/>
             :
           <Goal 
-            key={goal.id}
-            id={goal.id} 
+            key={goal._id}
+            id={goal._id} 
             name={goal.name}
-            startDate={goal.startDate} 
+            startDate={goal.startDate.split("T")[0]} 
             hours={goal.hours} 
             subtasks={goal.tasks}
             update={updateTaskForm}
             newTask={addTask}
-            startEdit={() => setEditReady(true)}
+            startEdit={startEdit}
           />
         ))}
       </div>
@@ -110,7 +143,7 @@ function App() {
           name={formData.name}
           startDate={formData.startDate}
           hours={formData.hours}
-          update={updateForm}
+          update={updateForm}           //arguments aere currently incompatible, but let's see if it still works
           cancel={() => setAddNew(false)}
           onSubmit={formHandler}
         /> : null}
