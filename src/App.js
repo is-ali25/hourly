@@ -46,7 +46,7 @@ function App() {
 
   //for adding tasks to goals
   const updateTaskForm = (value, id) => {
-    setTaskData({"id": id, "description": value })
+    setTaskData({"id": id, "description": value, "completed": false})
   }
 
   const addTask = async (e) => {
@@ -63,7 +63,21 @@ function App() {
     setTaskData(prevData => {return {...prevData, "description": ""}})
   }
   
-  //for editing tasks
+  //for editing and deleting tasks
+  const toggleBox = async (task, id) => {
+    console.log(id)
+    await axios.put(`http://localhost:5100/toggle/${id}`, task)
+    .then(res => res.data)
+    .catch(err => console.error(err))
+  }
+
+  const deleteTask = async (task, id) => {
+    console.log(id)
+    await axios.put(`http://localhost:5100/delete-task/${id}`, task)
+    .then(res => res.data)
+    .catch(err => console.error(err))
+  }
+
   const startEdit = (id) => {
     setFormData(prevData => {
       let newData = prevData
@@ -94,6 +108,39 @@ function App() {
       setFormData(prevData => {return {...prevData, [name]: value }})
   }
 
+  const increment = async (id) => {
+    console.log(id)
+    await axios.put(`http://localhost:5100/increment/${id}`)
+    .then(res => res.data)
+    .catch(err => console.error(err))
+    setGoals(prevData => {
+      let goals = prevData
+      goals.forEach((goal) => {
+        console.log(goal.id)
+          if (goal.id === id.id) {
+            goal.hours++
+          }
+      })
+      return goals
+    })
+  }
+
+  const decrement = async (id) => {
+    await axios.put(`http://localhost:5100/decrement/${id}`)
+    .then(res => res.data)
+    .catch(err => console.error(err))
+    setGoals(prevData => {
+      let newGoals = prevData
+      goals.forEach((goal) => {
+        console.log(goal.id)
+          if (goal.id === id.id) {
+            goal.hours--
+          }
+      })
+      return newGoals
+    })
+  }
+  
   const updateGoal = async (e) => {
     e.preventDefault()
     console.log(formData)
@@ -104,7 +151,12 @@ function App() {
     setEditReady(false)
   }
 
-  // for toggling tasks
+  const deleteGoal = async (id) => {
+    console.log(id)
+    await axios.delete(`http://localhost:5100/delete-goal/${id.id}`)
+    .then(res => res.data)
+    .catch(err => console.error(err))
+  }
 
   //the actual app
   return (
@@ -130,8 +182,13 @@ function App() {
             startDate={goal.startDate.split("T")[0]} 
             hours={goal.hours} 
             subtasks={goal.tasks}
+            taskComplete={toggleBox}
             update={updateTaskForm}
             newTask={addTask}
+            increment={increment}
+            decrement={decrement}
+            deleteTask={deleteTask}
+            deleteGoal={deleteGoal}
             startEdit={startEdit}
           />
         ))}
