@@ -2,6 +2,7 @@ import './App.css';
 import Goal from './Components/Goal'
 import GoalEdit from './Components/GoalEdit'
 import New from './Components/New'
+import Timer from './Components/Timer'
 // import Test from './Components/Test'
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
@@ -9,11 +10,23 @@ import * as Utils from './utils'
 import './App.css'
 
 function App() {
+    //this array is populated with fetched data
   const [goals, setGoals] = useState([])
+    //determines if the form to add anew goal will be displayed
   const [addNew, setAddNew] = useState(false)
-  const [editReady, setEditReady] = useState(false)
+    //determines if a particular goal will become editable or not
+  // const [editReady, setEditReady] = useState(false)
+  const [editReady, setEditReady] = useState([])
+    //used to keep track of the info related to a particular task the user is editing
   const [taskData, setTaskData] = useState({})
+    //data used for post requests
   const [formData, setFormData] = useState(Utils.blankForm())
+    //determines if the timer is active or not
+  const [timerOn, setTimerOn] = useState(false)
+    //used to display the values on the timer
+  const [seconds, setSeconds] = useState(0)
+    //contains the goals whose hours will be modified according to the value of the timer
+  const [active, setActive] = useState([])
 
   //retrieve goals from database
   useEffect(() => {
@@ -42,6 +55,7 @@ function App() {
     .catch(err => console.error(err))
     setAddNew(false)
     setFormData(Utils.blankForm())
+    setGoals(prevData => [...prevData, formatted])
   }
 
   //for adding tasks to goals
@@ -59,7 +73,18 @@ function App() {
     await axios.put(`http://localhost:5100/task-update/${taskData.id}`, newTask)
     .then(res => res.data)
     .catch(err => console.error(err))
-    //need to make component rerender
+
+    setGoals(prevData => {
+      let goals = prevData
+      goals.forEach(goal => {
+        if (goal.id === taskData.id && !(goal.tasks.includes(newTask))) { //adds new task to list twice w/o the second condition. Need to find out why
+          goal.tasks.push(newTask)
+        }
+      })
+      return goals
+    })
+
+    document.getElementById(taskData.id).value = ""
     setTaskData(prevData => {return {...prevData, "description": ""}})
   }
   
@@ -72,10 +97,22 @@ function App() {
   }
 
   const deleteTask = async (task, id) => {
-    console.log(id)
+    console.log(task)
     await axios.put(`http://localhost:5100/delete-task/${id}`, task)
     .then(res => res.data)
     .catch(err => console.error(err))
+
+    setGoals(prevData => {
+      let goals = [...prevData]
+      goals.forEach(goal => {
+        if (goal.id === id) {
+          goal.tasks = goal.tasks.filter(item => {
+            return item.description !== task.description
+          })
+        }
+      })
+      return goals
+    })
   }
 
   const startEdit = (id) => {
@@ -89,16 +126,24 @@ function App() {
       })
       return newData
     })
-    setEditReady(true)
+    setEditReady(prevData => [...prevData, id.id])
+  }
+
+  const cancelEdit = (id) => {
+    console.log(id)
+    setEditReady(prevData => {
+      const a = [...prevData].filter(curr => {return curr !== id})
+      return a
+    })
   }
 
   const updateForm = (name, value, id) => {
     console.log(id)
-    name == "tasks" ?
+    name === "tasks" ?
       setFormData(prevData => {
         let newTasks = prevData.tasks
         newTasks.forEach(task => {
-          if (task._id == id) {
+          if (task._id === id) {
             task.description = value
           }
         })
@@ -108,16 +153,17 @@ function App() {
       setFormData(prevData => {return {...prevData, [name]: value }})
   }
 
-  const increment = async (id) => {
+  const incrementHour = async (id) => {
     console.log(id)
     await axios.put(`http://localhost:5100/increment/${id}`)
     .then(res => res.data)
     .catch(err => console.error(err))
     setGoals(prevData => {
-      let goals = prevData
+      let goals = [...prevData]
       goals.forEach((goal) => {
         console.log(goal.id)
-          if (goal.id === id.id) {
+          if (goal.id === id) {
+            console.log("found goal to increment")
             goal.hours++
           }
       })
@@ -125,15 +171,16 @@ function App() {
     })
   }
 
-  const decrement = async (id) => {
+  const decrementHour = async (id) => {
     await axios.put(`http://localhost:5100/decrement/${id}`)
     .then(res => res.data)
     .catch(err => console.error(err))
     setGoals(prevData => {
-      let newGoals = prevData
+      let newGoals = [...prevData]
       goals.forEach((goal) => {
         console.log(goal.id)
-          if (goal.id === id.id) {
+          if (goal.id === id) {
+            console.log("found goal to decrement")
             goal.hours--
           }
       })
@@ -141,6 +188,7 @@ function App() {
     })
   }
   
+  //for editing and deleting goals
   const updateGoal = async (e) => {
     e.preventDefault()
     console.log(formData)
@@ -156,14 +204,66 @@ function App() {
     await axios.delete(`http://localhost:5100/delete-goal/${id.id}`)
     .then(res => res.data)
     .catch(err => console.error(err))
+    setGoals(goals.filter(goal => goal.id !== id.id)) //might need to be id.id
+  }
+
+  const addtoActive = (id) => {
+    if (!active.includes(id))
+    setActive(prevData => [...prevData, id])
+  }
+
+  //for starting, stopping, and changing data with the timer
+  const startTimer = () => {
+    setTimerOn(true)
+  }
+
+  useEffect(() => {
+    let intervalId = null;
+    if (timerOn) {
+      intervalId = setInterval(() => {
+        setSeconds(seconds => seconds + 1)
+        }, 1000)
+    } else {
+      clearInterval(intervalId)
+    }
+    return () => clearInterval(intervalId)
+  }, [timerOn])
+
+  const stopTimer = () => {
+    setTimerOn(false)
+  }
+
+  const resetTimer = () => {
+    setSeconds(0)
+  }
+
+  const addTime = () => {
+    active.forEach(id => {
+      const data = {id: id, time: seconds}
+      axios.put(`http://localhost:5100/addTime/${id.id}`, data)
+      .then(res => res.data)
+      .catch(err => console.error(err))
+
+      setGoals(prevData => {
+        const goals = prevData.map((goal) => {
+            if (goal.id === id.id) {
+              console.log("found goal to increment")
+              goal.hours += (seconds/3600)
+            }
+            return goal
+        })
+        return goals
+      })
+    })
   }
 
   //the actual app
   return (
     <div>
+      <Timer seconds={seconds} timerOn={timerOn} startTimer={startTimer} stopTimer={stopTimer} reset={resetTimer} addTime={addTime}/>
       <div className="App">
         {goals.map(goal => (
-          editReady ? 
+          editReady.includes(goal._id) ? 
           <GoalEdit 
             key={goal._id}
             id={goal._id} 
@@ -173,7 +273,7 @@ function App() {
             subtasks={goal.tasks}
             update={updateForm}
             edit={updateGoal}
-            cancel={() => setEditReady(false)}/>
+            cancel={() => cancelEdit(goal._id)}/>
             :
           <Goal 
             key={goal._id}
@@ -185,11 +285,12 @@ function App() {
             taskComplete={toggleBox}
             update={updateTaskForm}
             newTask={addTask}
-            increment={increment}
-            decrement={decrement}
+            increment={incrementHour}
+            decrement={decrementHour}
             deleteTask={deleteTask}
             deleteGoal={deleteGoal}
             startEdit={startEdit}
+            addtoActive={addtoActive}
           />
         ))}
       </div>
@@ -200,7 +301,7 @@ function App() {
           name={formData.name}
           startDate={formData.startDate}
           hours={formData.hours}
-          update={updateForm}           //arguments aere currently incompatible, but let's see if it still works
+          update={updateForm}  
           cancel={() => setAddNew(false)}
           onSubmit={formHandler}
         /> : null}

@@ -1,12 +1,14 @@
+body {
+  background-color: rgb(10, 7, 48);
+}
+
 .App {
   text-align: center;
   display: flex;
+  flex: 1;
+  flex-wrap: wrap;
   justify-content: space-evenly;
   padding-bottom: 4rem;
-}
-
-.App-link {
-  color: #61dafb;
 }
 
 .addGoal {

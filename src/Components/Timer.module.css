@@ -1,0 +1,33 @@
+.timer {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.timer h1 {
+    width: 25%;
+    position: relative;
+    left: 37.5%;
+    color: rgba(127, 255, 212, 0.879);
+    font-size: 4rem;
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+}
+
+.timerButtons {
+    width: 25%;
+    position: relative;
+    left: 37.5%;
+    display: flex;
+    align-items:flex-end;
+    justify-content: space-evenly;
+    margin-bottom: 5rem;
+}
+
+.timerButtons button {
+    width: 25%;
+    height: 3rem;
+    background-color: rgba(127, 255, 212, 0.807);
+    font-family:'Courier New', Courier, monospace
+}

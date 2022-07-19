@@ -133,6 +133,23 @@ app.put('/decrement/:id', async (req, res) => {
     }
 })
 
+app.put('/addTime/:id', async (req, res) => {
+    console.log(`adding ${req.body.time} seconds to ${req.params.id}`)
+    try {
+        let goal = await Goal.findOne({_id: req.params.id})
+        let hours = parseFloat(goal.hours)
+        hours += (req.body.time/3600)
+        console.log(hours)
+        goal.hours = hours
+        console.log(goal.hours)
+        await Goal.updateOne({_id: req.params.id}, {$set: {"hours" : hours}})
+        .then(updated => res.json(updated))
+        console.log('successfully added hours')
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+})
+
 app.delete('/delete-goal/:id', async (req, res) => {
     console.log(req.params.id)
     try {
