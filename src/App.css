@@ -2,6 +2,16 @@ body {
   background-color: rgb(10, 7, 48);
 }
 
+.filter {
+  position: fixed;
+  width: 100%;
+  height: 110%;
+  top: -10%;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, .85); /*wanna make this a gradient at some point*/
+  z-index: 1;
+}
+
 .App {
   text-align: center;
   display: flex;
@@ -11,9 +21,23 @@ body {
   padding-bottom: 4rem;
 }
 
-.addGoal {
+/* .addGoal {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+} */
+
+.addGoalButton {
+  position: relative;
+  left: 45%;  /*don't liek this*/
+  transform: translateX(-50);
+  width: 10%;
+  height: 3rem;
+  background-color: rgba(127, 255, 212, 0.807);
+  font-family:'Courier New', Courier, monospace;
+  display: flex;
+  align-items:center;
+  justify-content: space-evenly;
+  margin-bottom: 2rem;
 }

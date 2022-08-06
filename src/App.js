@@ -1,4 +1,5 @@
 import './App.css';
+// import AppCSS from "./App.module.css"
 import Goal from './Components/Goal'
 import GoalEdit from './Components/GoalEdit'
 import New from './Components/New'
@@ -12,7 +13,7 @@ import './App.css'
 function App() {
     //this array is populated with fetched data
   const [goals, setGoals] = useState([])
-    //determines if the form to add anew goal will be displayed
+    //determines if the form to add a new goal will be displayed
   const [addNew, setAddNew] = useState(false)
     //determines if a particular goal will become editable or not
   // const [editReady, setEditReady] = useState(false)
@@ -208,8 +209,16 @@ function App() {
   }
 
   const addtoActive = (id) => {
-    if (!active.includes(id))
-    setActive(prevData => [...prevData, id])
+    if (!active.includes(id.id)) {
+      setActive(prevData => [...prevData, id.id])
+      document.getElementById(id.id).style.backgroundColor = "#AB90ff"
+    } else {
+      setActive(prevData => {
+        let a = [...prevData].filter(curr => curr !== id.id)
+        return a
+      })
+      document.getElementById(id.id).style.backgroundColor = "rgba(153, 249, 217, 0.896)"
+    }
   }
 
   //for starting, stopping, and changing data with the timer
@@ -240,13 +249,13 @@ function App() {
   const addTime = () => {
     active.forEach(id => {
       const data = {id: id, time: seconds}
-      axios.put(`http://localhost:5100/addTime/${id.id}`, data)
+      axios.put(`http://localhost:5100/addTime/${id}`, data)
       .then(res => res.data)
       .catch(err => console.error(err))
 
       setGoals(prevData => {
         const goals = prevData.map((goal) => {
-            if (goal.id === id.id) {
+            if (goal.id === id) {
               console.log("found goal to increment")
               goal.hours += (seconds/3600)
             }
@@ -260,6 +269,10 @@ function App() {
   //the actual app
   return (
     <div>
+      {addNew ? 
+      <div className='filter'></div>
+      : null}
+
       <Timer seconds={seconds} timerOn={timerOn} startTimer={startTimer} stopTimer={stopTimer} reset={resetTimer} addTime={addTime}/>
       <div className="App">
         {goals.map(goal => (
@@ -295,8 +308,8 @@ function App() {
         ))}
       </div>
         
-        <div className='addGoal'>
-        <button className="newItem" onClick={() => setAddNew(!addNew)}>Add Goal</button>
+        {/* <div className='addGoal'> */}
+        <button className='addGoalButton' onClick={() => setAddNew(!addNew)}>Add Goal</button>
         {addNew ? <New 
           name={formData.name}
           startDate={formData.startDate}
@@ -305,7 +318,7 @@ function App() {
           cancel={() => setAddNew(false)}
           onSubmit={formHandler}
         /> : null}
-        </div>
+        {/* </div> */}
     
     </div>
   );

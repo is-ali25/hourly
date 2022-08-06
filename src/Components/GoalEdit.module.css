@@ -1,0 +1,47 @@
+button {
+    background-color: rgba(255, 255, 255, 0);
+    cursor: pointer;
+}
+
+.goalEdit {
+    min-width: 20%;
+    border-radius: 5%;
+    background-color: rgba(153, 249, 217, 0.896);
+}
+
+.hours {
+    /*don't like the positioning solution here*/
+    width: 50%;
+    position: relative;
+    left: 25%;
+    display: flex;
+    justify-content: space-around;
+    margin-top: -1rem;
+}
+
+.taskEdit {
+    width: 90%;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start
+}
+
+.calendar {
+    width: 40%;
+}
+
+.taskInput {
+    width: 70%;
+    display: flex;
+    justify-content: right;
+    font-size: small;
+}
+
+.submit {
+    width: 30%;
+}
+
+.cancel {
+    margin-bottom: 1rem;
+}

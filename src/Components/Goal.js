@@ -3,7 +3,7 @@ import {FaTrash, FaPlusCircle, FaMinusCircle} from 'react-icons/fa'
 
 const Goal = ({id, name, startDate, hours, increment, decrement, subtasks, taskComplete, update, newTask, deleteGoal, deleteTask, startEdit, addtoActive}) => {
     return(
-        <div className={GoalCSS.goal}>
+        <div id={id} className={GoalCSS.goal}>
             <h1>{name}</h1>
             <h4>Started: {startDate.split("-")[1]}/{startDate.split("-")[2]}/{startDate.split("-")[0]}</h4>
             <div className={GoalCSS.hours}>
@@ -25,7 +25,7 @@ const Goal = ({id, name, startDate, hours, increment, decrement, subtasks, taskC
                     <button className="delete" onClick={() => deleteTask(task, id)}><FaTrash/></button>
                 </div>
             ))}
-            <form onSubmit={newTask}>
+            <form className={GoalCSS.addTaskForm} onSubmit={newTask}>
                 <input id={id} className={GoalCSS.textInput} type="text" onChange= {(e) => update(e.target.value, id)}/> 
                 <input type="submit" value="+"></input>
             </form> 
