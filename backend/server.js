@@ -107,6 +107,20 @@ app.put('/goal-update/:id', async (req, res) => {
     }
 })
 
+app.put('/update-hours/:id', async (req, res) => {
+    console.log(req.body)
+    console.log(`incrementing hours for ${req.params.id}`)
+    try {
+        let goal = await Goal.findOne({_id: req.params.id})
+        goal.hours = req.body
+        await Goal.updateOne({_id: req.params.id}, {$set: {"hours" : goal.hours}})
+        .then(updated => res.json(updated))
+        console.log('successfully updated hours')
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+})
+
 app.put('/increment/:id', async (req, res) => {
     console.log(`incrementing hours for ${req.params.id}`)
     try {

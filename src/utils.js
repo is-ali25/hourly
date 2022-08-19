@@ -9,7 +9,6 @@ export function blankForm() {
 
 export function convertToGoal(submission) {
     const goal = {
-        _id: submission._id,
         id: submission._id,
         name: submission.name,
         startDate:submission.startDate,

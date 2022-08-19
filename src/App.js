@@ -1,33 +1,47 @@
-import './App.css';
-// import AppCSS from "./App.module.css"
+//styles
+import './App.css'
+
+//componenets
 import Goal from './Components/Goal'
 import GoalEdit from './Components/GoalEdit'
 import New from './Components/New'
 import Timer from './Components/Timer'
 // import Test from './Components/Test'
+
+//dependencies and external libraries
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import * as Utils from './utils'
-import './App.css'
 
 function App() {
-    //this array is populated with fetched data
   const [goals, setGoals] = useState([])
+
     //determines if the form to add a new goal will be displayed
   const [addNew, setAddNew] = useState(false)
-    //determines if a particular goal will become editable or not
-  // const [editReady, setEditReady] = useState(false)
+
+    //includes goals which are editable
   const [editReady, setEditReady] = useState([])
+
     //used to keep track of the info related to a particular task the user is editing
   const [taskData, setTaskData] = useState({})
+
+    //contains the completed and uncompleted tasks for each goal
+  const [complete, setComplete] = useState({})
+  const [incomplete, setIncomplete] = useState({})
+
     //data used for post requests
   const [formData, setFormData] = useState(Utils.blankForm())
+
     //determines if the timer is active or not
   const [timerOn, setTimerOn] = useState(false)
+
     //used to display the values on the timer
   const [seconds, setSeconds] = useState(0)
+
     //contains the goals whose hours will be modified according to the value of the timer
   const [active, setActive] = useState([])
+
+
 
   //retrieve goals from database
   useEffect(() => {
@@ -36,16 +50,57 @@ function App() {
       .then(res => {
         // console.log(res.data)
         const cleaned = res.data.map(item => Utils.convertToGoal(item))
-        console.log(cleaned)
         setGoals(cleaned)
+
+        cleaned.forEach(goal => {               //have to use cleaned cuz it won't work when I used goals instead
+          const goalId = goal.id;
+          setComplete(prevData => {
+            return {...prevData, [goalId]: []}
+          })
+          setIncomplete(prevData => {
+            return {...prevData, [goalId]: []}
+          })
+        })
+
+        cleaned.forEach(goal => {
+          goal.tasks.forEach(task => {
+            if (task.completed) {
+              setComplete(prevData => {
+                const goalId = goal.id
+                let newCompletes = prevData[goalId]
+                newCompletes.push(task)
+                return {...prevData, goalId: newCompletes}
+              })
+            } else {
+              setIncomplete(prevData => {
+                const goalId = goal.id
+                let newIncompletes = prevData[goalId]
+                newIncompletes.push(task)
+                return {...prevData, goalId: newIncompletes}
+              })
+            }
+          })
+        })
       })
       .catch(err => console.error(err))
     }
 
     start()
+
+    //cleanup function
+    // return () => {
+    //   goals.forEach(goal => {
+    //     const newHours = goal.hours
+    //     axios.put(`http://localhost:5100/update-hours/${goal.id}`, newHours)
+    //   .then(res => res.data)
+    //   .catch(err => console.error(err))
+    //   })
+    // }
   }, [])
 
   console.log(goals)
+  console.log(complete)
+  console.log(incomplete)
 
   
   //for adding goals
@@ -117,17 +172,18 @@ function App() {
   }
 
   const startEdit = (id) => {
+    console.log(id)
     setFormData(prevData => {
       let newData = prevData
       newData.id = id
       goals.forEach(goal => {
-        if (goal._id === id.id) {
+        if (goal.id === id) {
           newData.tasks = goal.tasks
         }
       })
       return newData
     })
-    setEditReady(prevData => [...prevData, id.id])
+    setEditReady(prevData => [...prevData, id])
   }
 
   const cancelEdit = (id) => {
@@ -194,30 +250,33 @@ function App() {
     e.preventDefault()
     console.log(formData)
     console.log(formData.id)
-    await axios.put(`http://localhost:5100/goal-update/${formData.id.id}`, formData)
+    await axios.put(`http://localhost:5100/goal-update/${formData.id}`, formData)
     .then(res => res.data)
     .catch(err => console.error(err))
-    setEditReady(false)
+    setEditReady(prevData => {
+      const a = [...prevData].filter(curr => {return curr !== formData.id})
+      return a
+    })
   }
 
   const deleteGoal = async (id) => {
     console.log(id)
-    await axios.delete(`http://localhost:5100/delete-goal/${id.id}`)
+    await axios.delete(`http://localhost:5100/delete-goal/${id}`)
     .then(res => res.data)
     .catch(err => console.error(err))
-    setGoals(goals.filter(goal => goal.id !== id.id)) //might need to be id.id
+    setGoals(goals.filter(goal => goal.id !== id))
   }
 
   const addtoActive = (id) => {
-    if (!active.includes(id.id)) {
-      setActive(prevData => [...prevData, id.id])
-      document.getElementById(id.id).style.backgroundColor = "#AB90ff"
+    if (!active.includes(id)) {
+      setActive(prevData => [...prevData, id])
+      document.getElementById(id).style.backgroundColor = "#AB90ff"
     } else {
       setActive(prevData => {
-        let a = [...prevData].filter(curr => curr !== id.id)
+        let a = [...prevData].filter(curr => curr !== id)
         return a
       })
-      document.getElementById(id.id).style.backgroundColor = "rgba(153, 249, 217, 0.896)"
+      document.getElementById(id).style.backgroundColor = "rgba(153, 249, 217, 0.896)"
     }
   }
 
@@ -266,6 +325,17 @@ function App() {
     })
   }
 
+  //redundant?
+  const addtoComplete = (task, goalId) => {
+    console.log(goalId)
+    console.log(`adding task to ${goalId} completed list`)
+    setComplete(prevData => {
+      let newCompletes = prevData[goalId]
+      newCompletes.push(task)
+      return {...prevData, goalId: newCompletes}
+    })
+  }
+
   //the actual app
   return (
     <div>
@@ -276,26 +346,27 @@ function App() {
       <Timer seconds={seconds} timerOn={timerOn} startTimer={startTimer} stopTimer={stopTimer} reset={resetTimer} addTime={addTime}/>
       <div className="App">
         {goals.map(goal => (
-          editReady.includes(goal._id) ? 
+          editReady.includes(goal.id) ? 
           <GoalEdit 
-            key={goal._id}
-            id={goal._id} 
+            key={goal.id}
+            id={goal.id} 
             name={goal.name}
             startDate={goal.startDate.split("T")[0]} 
             hours={goal.hours} 
             subtasks={goal.tasks}
             update={updateForm}
             edit={updateGoal}
-            cancel={() => cancelEdit(goal._id)}/>
+            cancel={() => cancelEdit(goal.id)}/>
             :
           <Goal 
-            key={goal._id}
-            id={goal._id} 
+            key={goal.id}
+            id={goal.id} 
             name={goal.name}
             startDate={goal.startDate.split("T")[0]} 
             hours={goal.hours} 
-            subtasks={goal.tasks}
+            incomplete={incomplete[goal.id]}
             taskComplete={toggleBox}
+            complete={complete[goal.id]}
             update={updateTaskForm}
             newTask={addTask}
             increment={incrementHour}

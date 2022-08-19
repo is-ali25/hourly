@@ -1,7 +1,7 @@
 import GoalCSS from "./Goal.module.css"
 import {FaTrash, FaPlusCircle, FaMinusCircle} from 'react-icons/fa'
 
-const Goal = ({id, name, startDate, hours, increment, decrement, subtasks, taskComplete, update, newTask, deleteGoal, deleteTask, startEdit, addtoActive}) => {
+const Goal = ({id, name, startDate, hours, increment, decrement, incomplete, taskComplete, complete, update, newTask, deleteGoal, deleteTask, startEdit, addtoActive}) => {
     return(
         <div id={id} className={GoalCSS.goal}>
             <h1>{name}</h1>
@@ -12,27 +12,29 @@ const Goal = ({id, name, startDate, hours, increment, decrement, subtasks, taskC
                 <button onClick={() => increment(id)}><FaPlusCircle/></button>
             </div>
         
-            {subtasks.map(task => ( 
-                // task.completed ?
-                // <div key={task._id}>
-                //     <input type="checkbox" checked onChange={() => taskComplete(task, id)}/>
-                //     <label>{task.description}</label><br/>
-                // </div>
-                //     :
+            {incomplete && incomplete.map(task => ( 
                 <div key={task._id} className={GoalCSS.task}>
-                    <input type="checkbox" onChange={() => taskComplete(task, id)}/>
-                    <label>{task.description}</label><br/>
-                    <button className="delete" onClick={() => deleteTask(task, id)}><FaTrash/></button>
+                <input type="checkbox" onChange={() => taskComplete(task, id)}/>
+                <label>{task.description}</label><br/>
+                <button className="delete" onClick={() => deleteTask(task, id)}><FaTrash/></button>
                 </div>
             ))}
             <form className={GoalCSS.addTaskForm} onSubmit={newTask}>
                 <input id={id} className={GoalCSS.textInput} type="text" onChange= {(e) => update(e.target.value, id)}/> 
                 <input type="submit" value="+"></input>
             </form> 
+            {complete && complete.map(task => ( 
+                //prolly wanna change the className this later
+                <div key={task._id} className={GoalCSS.task}>
+                    <input type="checkbox" onChange={() => taskComplete(task, id)}/>
+                    <label>{task.description}</label><br/>
+                    <button className="delete" onClick={() => deleteTask(task, id)}><FaTrash/></button>
+                </div>
+            ))}
             <div className={GoalCSS.goalButtons}>
-                <button onClick={() => startEdit({id})}>Edit Goal</button>
-                <button onClick={() => deleteGoal({id})}>Delete Goal</button>
-                <button onClick={() => addtoActive({id})}>Add to Active List</button>
+                <button onClick={() => startEdit(id)}>Edit Goal</button>
+                <button onClick={() => deleteGoal(id)}>Delete Goal</button>
+                <button onClick={() => addtoActive(id)}>Add to Active List</button>
             </div>
         </div>
     )

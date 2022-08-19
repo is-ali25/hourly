@@ -9,9 +9,11 @@ TODO:
 -add placeholder value to goal newTask form [x]
 
 FUTURE:
--completed task list
+-completed task list [+]
+    -need to add onClick functionality
 -find a function that does shit when you close the site [+]
--id shennanigans
+    -change the hour property of each goal if necessary [+]
+-id shennanigans [+]
 -Goal Edit start date
 -handling responses from server (meaning use responses from server to rerender state if necessary)
 -add color variable to goals 
@@ -22,3 +24,4 @@ FUTURE:
 -animations
 -get shit working in react strict mode (AKA rafactor your code in terms of pure functions)
 -port to redux
+-fullspread, tunnel, rest, slow pokes, freeform
