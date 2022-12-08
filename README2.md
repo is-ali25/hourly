@@ -10,15 +10,16 @@ TODO:
 
 FUTURE:
 -completed task list [+]
-    -need to add onClick functionality
+    -need to change state onClick
 -find a function that does shit when you close the site [+]
     -change the hour property of each goal if necessary [+]
 -id shennanigans [+]
+-add daily driver section
 -Goal Edit start date
 -handling responses from server (meaning use responses from server to rerender state if necessary)
--add color variable to goals 
+-add color variable to goals
+-use tricks for form handling
 -add countdown timer
--make seperate section for completed tasks
 -fonts
 -drop shadows
 -animations

@@ -23,11 +23,12 @@ const Goal = ({id, name, startDate, hours, increment, decrement, incomplete, tas
                 <input id={id} className={GoalCSS.textInput} type="text" onChange= {(e) => update(e.target.value, id)}/> 
                 <input type="submit" value="+"></input>
             </form> 
+            <h3>Completed</h3>
             {complete && complete.map(task => ( 
                 //prolly wanna change the className this later
                 <div key={task._id} className={GoalCSS.task}>
-                    <input type="checkbox" onChange={() => taskComplete(task, id)}/>
-                    <label>{task.description}</label><br/>
+                    <input type="checkbox" onChange={() => taskComplete(task, id)} checked/>
+                    <label><s>{task.description}</s></label><br/>
                     <button className="delete" onClick={() => deleteTask(task, id)}><FaTrash/></button>
                 </div>
             ))}

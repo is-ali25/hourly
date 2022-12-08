@@ -7,6 +7,7 @@ button {
     min-width: 20%;
     border-radius: 5%;
     background-color: rgba(153, 249, 217, 0.896);
+    margin: 2rem;
 }
 
 .hours {
