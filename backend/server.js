@@ -14,7 +14,7 @@ app.use(cors())
 app.use(express.json())
 
 const URL = process.env.DB_CONNECTION
-console.log(URL)
+// console.log(URL)
 
 // //connect to database
 mongoose.connect(URL, {useNewUrlParser: true, useUnifiedTopology: true})

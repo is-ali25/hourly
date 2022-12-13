@@ -98,9 +98,9 @@ function App() {
     // }
   }, [])
 
-  console.log(goals)
-  console.log(complete)
-  console.log(incomplete)
+  // console.log(goals)
+  // console.log(complete)
+  // console.log(incomplete)
 
   
   //for adding goals
