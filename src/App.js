@@ -46,7 +46,7 @@ function App() {
   //retrieve goals from database
   useEffect(() => {
     async function start() {
-      await axios.get('http://localhost:5100/')
+      await axios.get('https://hourly-backend.onrender.com/')
       .then(res => {
         // console.log(res.data)
         const cleaned = res.data.map(item => Utils.convertToGoal(item))
@@ -107,7 +107,7 @@ function App() {
   const formHandler = async (e) => {
     e.preventDefault()
     const formatted = Utils.format(formData, goals.length)
-    await axios.post('http://localhost:5100/add', formatted)
+    await axios.post('https://hourly-backend.onrender.com/add', formatted)
     .catch(err => console.error(err))
     setAddNew(false)
     setFormData(Utils.blankForm())
@@ -126,7 +126,7 @@ function App() {
       description: taskData.description,
       completed: false
     }
-    await axios.put(`http://localhost:5100/task-update/${taskData.id}`, newTask)
+    await axios.put(`https://hourly-backend.onrender.com/task-update/${taskData.id}`, newTask)
     .then(res => res.data)
     .catch(err => console.error(err))
 
@@ -147,14 +147,14 @@ function App() {
   //for editing and deleting tasks
   const toggleBox = async (task, id) => {
     console.log(id)
-    await axios.put(`http://localhost:5100/toggle/${id}`, task)
+    await axios.put(`https://hourly-backend.onrender.com/toggle/${id}`, task)
     .then(res => res.data)
     .catch(err => console.error(err))
   }
 
   const deleteTask = async (task, id) => {
     console.log(task)
-    await axios.put(`http://localhost:5100/delete-task/${id}`, task)
+    await axios.put(`https://hourly-backend.onrender.com/delete-task/${id}`, task)
     .then(res => res.data)
     .catch(err => console.error(err))
 
@@ -212,7 +212,7 @@ function App() {
 
   const incrementHour = async (id) => {
     console.log(id)
-    await axios.put(`http://localhost:5100/increment/${id}`)
+    await axios.put(`https://hourly-backend.onrender.com/increment/${id}`)
     .then(res => res.data)
     .catch(err => console.error(err))
     setGoals(prevData => {
@@ -229,7 +229,7 @@ function App() {
   }
 
   const decrementHour = async (id) => {
-    await axios.put(`http://localhost:5100/decrement/${id}`)
+    await axios.put(`https://hourly-backend.onrender.com/decrement/${id}`)
     .then(res => res.data)
     .catch(err => console.error(err))
     setGoals(prevData => {
@@ -250,7 +250,7 @@ function App() {
     e.preventDefault()
     console.log(formData)
     console.log(formData.id)
-    await axios.put(`http://localhost:5100/goal-update/${formData.id}`, formData)
+    await axios.put(`https://hourly-backend.onrender.com/goal-update/${formData.id}`, formData)
     .then(res => res.data)
     .catch(err => console.error(err))
     setEditReady(prevData => {
@@ -261,7 +261,7 @@ function App() {
 
   const deleteGoal = async (id) => {
     console.log(id)
-    await axios.delete(`http://localhost:5100/delete-goal/${id}`)
+    await axios.delete(`https://hourly-backend.onrender.com/delete-goal/${id}`)
     .then(res => res.data)
     .catch(err => console.error(err))
     setGoals(goals.filter(goal => goal.id !== id))
@@ -308,7 +308,7 @@ function App() {
   const addTime = () => {
     active.forEach(id => {
       const data = {id: id, time: seconds}
-      axios.put(`http://localhost:5100/addTime/${id}`, data)
+      axios.put(`https://hourly-backend.onrender.com/addTime/${id}`, data)
       .then(res => res.data)
       .catch(err => console.error(err))
 

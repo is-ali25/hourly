@@ -7,7 +7,7 @@ require('body-parser')
 
 //initiate server
 const app = express()
-const port = 5100
+const port = process.env.PORT || 5100
 
 //middleware
 app.use(cors())
@@ -18,6 +18,11 @@ const URL = process.env.DB_CONNECTION
 
 // //connect to database
 mongoose.connect(URL, {useNewUrlParser: true, useUnifiedTopology: true})
+    .catch(error =>{
+        console.log(error)
+        throw Error("DB connection problem")
+    })
+    
 const connection = mongoose.connection
 connection.once('open', () => {console.log('successfully connected to MongoDB database')})
 
